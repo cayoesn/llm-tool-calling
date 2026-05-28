@@ -1,0 +1,36 @@
+# Core
+fastapi[all]>=0.111.0
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+uvicorn>=0.30.0
+asyncio>=3.4.3
+python-dotenv>=1.0.1
+
+# Database & Cache
+sqlalchemy>=2.0.30
+psycopg2-binary>=2.9.9
+asyncpg>=0.29.0
+redis>=5.0.4
+
+# LLM
+ollama>=0.2.1
+
+# Observability
+opentelemetry-api>=1.25.0
+opentelemetry-sdk>=1.25.0
+opentelemetry-instrumentation-fastapi>=0.46b0
+opentelemetry-exporter-otlp>=1.25.0
+prometheus-client>=0.20.0
+mlflow>=2.13.0
+python-json-logger>=2.0.7
+
+# Testing (to be used later)
+pytest>=8.2.0
+pytest-asyncio>=0.23.6
+pytest-cov>=5.0.0
+httpx>=0.27.0
+
+# Quality
+ruff>=0.4.4
+mypy>=1.10.0
+black>=24.4.2
