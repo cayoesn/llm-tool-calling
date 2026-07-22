@@ -2,7 +2,7 @@
 
 install:
 	python -m venv .venv
-	.venv\Scripts\pip install -r requirements.txt
+	.venv\Scripts\pip install -e .[dev]
 
 lint:
 	.venv\Scripts\ruff check .
