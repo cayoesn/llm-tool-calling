@@ -1,5 +1,6 @@
+import uuid
 from pydantic import BaseModel, Field
-from typing import Dict, Any, Optional, Type
+from typing import Dict, Any, Optional, Type, List
 from enum import Enum
 
 class ToolExecutionStatus(str, Enum):
@@ -9,6 +10,7 @@ class ToolExecutionStatus(str, Enum):
     FAILED = "failed"
     TIMEOUT = "timeout"
     RETRYING = "retrying"
+    SKIPPED = "skipped"
 
 class RetryPolicy(BaseModel):
     max_retries: int = 3
@@ -25,11 +27,14 @@ class ToolMetadata(BaseModel):
     retry_policy: RetryPolicy = Field(default_factory=RetryPolicy)
 
 class ToolCall(BaseModel):
+    call_id: str = Field(default_factory=lambda: str(uuid.uuid4())[:8])
     tool_name: str
     arguments: Dict[str, Any]
     session_id: Optional[str] = None
+    depends_on: List[str] = Field(default_factory=list)
 
 class ToolResult(BaseModel):
+    call_id: Optional[str] = None
     tool_name: str
     status: ToolExecutionStatus
     output: Any

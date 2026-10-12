@@ -27,6 +27,7 @@ class ExecutionEngine:
                 if not tool:
                     TOOL_EXECUTION_COUNT.labels(tool_name=tool_call.tool_name, status="not_found").inc()
                     return ToolResult(
+                        call_id=tool_call.call_id,
                         tool_name=tool_call.tool_name,
                         status=ToolExecutionStatus.FAILED,
                         output=None,
@@ -38,6 +39,7 @@ class ExecutionEngine:
                 if not security_manager.is_tool_allowed(tool.metadata.name, tool.metadata.category, tool_call.session_id):
                     TOOL_EXECUTION_COUNT.labels(tool_name=tool.metadata.name, status="permission_denied").inc()
                     return ToolResult(
+                        call_id=tool_call.call_id,
                         tool_name=tool_call.tool_name,
                         status=ToolExecutionStatus.FAILED,
                         output=None,
@@ -50,6 +52,7 @@ class ExecutionEngine:
                 if not is_valid:
                     TOOL_EXECUTION_COUNT.labels(tool_name=tool.metadata.name, status="validation_failed").inc()
                     return ToolResult(
+                        call_id=tool_call.call_id,
                         tool_name=tool_call.tool_name,
                         status=ToolExecutionStatus.FAILED,
                         output=None,
@@ -74,6 +77,7 @@ class ExecutionEngine:
                         if not is_valid_output:
                             TOOL_EXECUTION_COUNT.labels(tool_name=tool.metadata.name, status="output_validation_failed").inc()
                             return ToolResult(
+                                call_id=tool_call.call_id,
                                 tool_name=tool_call.tool_name,
                                 status=ToolExecutionStatus.FAILED,
                                 output=output,
@@ -87,6 +91,7 @@ class ExecutionEngine:
                         TOOL_EXECUTION_COUNT.labels(tool_name=tool.metadata.name, status="success").inc()
                         
                         return ToolResult(
+                            call_id=tool_call.call_id,
                             tool_name=tool_call.tool_name,
                             status=ToolExecutionStatus.SUCCESS,
                             output=output,
@@ -99,6 +104,7 @@ class ExecutionEngine:
                         if retries >= policy.max_retries:
                             TOOL_EXECUTION_COUNT.labels(tool_name=tool.metadata.name, status="timeout").inc()
                             return ToolResult(
+                                call_id=tool_call.call_id,
                                 tool_name=tool_call.tool_name,
                                 status=ToolExecutionStatus.TIMEOUT,
                                 output=None,
@@ -111,6 +117,7 @@ class ExecutionEngine:
                         if retries >= policy.max_retries:
                             TOOL_EXECUTION_COUNT.labels(tool_name=tool.metadata.name, status="failed").inc()
                             return ToolResult(
+                                call_id=tool_call.call_id,
                                 tool_name=tool_call.tool_name,
                                 status=ToolExecutionStatus.FAILED,
                                 output=None,
@@ -128,6 +135,7 @@ class ExecutionEngine:
 
                 TOOL_EXECUTION_COUNT.labels(tool_name=tool.metadata.name, status="max_retries_reached").inc()
                 return ToolResult(
+                    call_id=tool_call.call_id,
                     tool_name=tool_call.tool_name,
                     status=ToolExecutionStatus.FAILED,
                     output=None,

@@ -26,11 +26,12 @@ Este projeto implementa a infraestrutura necessária para que um LLM não apenas
 
 ## 🧭 Visão Geral
 
-O **LLM Tool Calling Runtime** resolve o desafio de integrar LLMs com ferramentas externas de forma confiável:
-- **Structured Planning**: Usa o Ollama (Llama 3) para decidir quais ferramentas chamar e com quais argumentos.
-- **Dynamic Registry**: Registro centralizado de ferramentas com metadados automáticos.
-- **Safe Execution**: Isolamento de execução, timeouts e tratamento de erros.
-- **Deep Observability**: Rastreia desde a intenção do LLM até o resultado da ferramenta.
+O **LLM Tool Calling Runtime** resolve o desafio de integrar LLMs com ferramentas externas de forma confiável e em escala:
+- **DAG Topological Scheduling**: Escalonador de grafo acíclico dirigido (`graphlib.TopologicalSorter`) que executa nós independentes em ondas paralelas concorrentes via `asyncio.gather`, reduzindo a latência total para o caminho crítico $\mathcal{O}(\text{depth})$ em vez da soma sequencial $\mathcal{O}(\sum t_i)$.
+- **Fail-Fast Skip Propagation**: Propagação inteligente de cancelamento (`SKIPPED`) quando ferramentas upstream falham, evitando execuções inúteis e desperdício de recursos.
+- **Cycle Detection & Deadlock Prevention**: Validação estrita de aciclicidade impedindo travamentos.
+- **Structured Planning & Dynamic Registry**: Validação tipada via schemas Pydantic e controle de permissões.
+- **Deep Observability**: Tracing distribuído via OpenTelemetry/Jaeger e métricas Prometheus.
 
 ---
 
@@ -184,15 +185,15 @@ A stack de observabilidade permite auditar cada decisão do agente:
 
 ## ✅ Testes e Coverage
 
-Para rodar os testes e garantir a integridade do sistema:
+Para rodar os testes de forma 100% hermética via container isolado:
 
 ```bash
-make test
+docker run --rm -v $(pwd):/workspace -w /workspace -e PYTHONPATH=/workspace portfolio-spec-engine:test pytest tests -v
 ```
 
-Para ver o relatório de cobertura:
+Ou usando o Makefile local:
 ```bash
-make coverage
+make test
 ```
 
 ---
